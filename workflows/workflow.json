@@ -1,0 +1,1272 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "alit",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -736,
+        -2128
+      ],
+      "id": "6ed62909-7f8e-4838-8de5-a07b62eca038",
+      "name": "Webhook",
+      "webhookId": "d795f12d-f13f-4558-ac33-bafae24f4d26"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "376f0833-4df8-46aa-9d61-f553c7de3ea7",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "7677e668-978f-4994-b11e-404ab2a1dd00",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "tokensuha",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -512,
+        -2320
+      ],
+      "id": "440fb31b-f392-4ae7-bdfb-92d73479fe5d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -288,
+        -2416
+      ],
+      "id": "b5b99b1c-3a3c-407b-a927-e6ce3c658530",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -288,
+        -2224
+      ],
+      "id": "043c7d0a-7e66-40b6-855b-73a72d6ae8c1",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5f6b95a5-7152-4b70-9db6-163410b78579",
+              "name": "sender_id",
+              "value": "={{ $json.body.entry[0].messaging[0].sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "2de0d29f-4df7-4d98-902b-dedf6d683acc",
+              "name": "receiver_id",
+              "value": "={{ $json.body.entry[0].messaging[0].recipient.id }}",
+              "type": "string"
+            },
+            {
+              "id": "53ddb29e-6492-4585-a841-c773da7b94e0",
+              "name": "message",
+              "value": "={{ $json.body.entry[0].messaging[0].message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "62cca38c-ef89-4e7a-b86e-f9a2f100eb0c",
+              "name": "M-ID",
+              "value": "={{ $json.body.entry[0].messaging[0].message.mid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        -1500
+      ],
+      "id": "78bf2922-717a-44ef-b0e9-a20574152d89",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Message: {{ $json.message }}\nReply in a human, natural tone. Keep it short and helpful. Keep message simple. Be spesific. ",
+        "options": {
+          "systemMessage": "=আপনি একজন AI Order Formatter। আপনার কাজ হলো কাস্টমারের অর্ডার সম্পর্কিত সমস্ত তথ্য সুন্দরভাবে, professional এবং readable Bangla text এ সাজিয়ে লেখা।\n\nInput: কাস্টমারের অর্ডারের সব details। যেমন: Customer Name, Phone Number, Address, Police Station, Area, Ordered Product ID, Ordered Product Name, Color, Price, Delivery Charge, Total Bill, Notes, Order Date, Image:true/false।\n\nRules:\n\nOutput Bangla, friendly ও professional।\n\nSingle-line text নয়, paragraph বা bullet point style এ সাজিয়ে লিখুন।\n\nসব detail clearly visible থাকবে।\n\nPrice, Delivery Charge, Total Bill অবশ্যই উল্লেখ করুন।\n\nNotes যদি থাকে, include করুন।\n\n\nকোনো Emoji বা unnecessary character ব্যবহার করবেন না।\n\n{{ $('Information Extractor1').item.json.output['order details'] }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        976,
+        -1404
+      ],
+      "id": "7a817849-c82a-41e6-890b-b84e03b1c17d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9b6e915f-c4b5-4d81-98a8-30abe2867db2",
+              "leftValue": "={{ $json.body.entry[0].messaging[0].message.attachments[0].type }}",
+              "rightValue": "audio",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -512,
+        -1840
+      ],
+      "id": "df210b0b-3d78-4343-875e-c58257990fd2",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4762a5d6-7637-4cd3-ac54-5d4e88abdbde",
+              "leftValue": "={{ $json.body.entry[0].messaging[0].message.attachments[0].type }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        -1840
+      ],
+      "id": "5dd43d86-9a75-48bb-8da4-69621e389e2e",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.imageUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        -1840
+      ],
+      "id": "53193bbd-cc38-4be8-a5fc-c444175f873e",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"imageUrl\": \"{{ $json['body']['entry'][0]['messaging'][0]['message']['attachments'][0]['payload']['url'] }}\"\n}\n\n\n\n\n",
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        56,
+        -1840
+      ],
+      "id": "8576596d-a5e8-4047-ba79-d904793abb59",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.reply }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Image Type",
+              "description": "If the Image is like food menu or food plater, then say \"Food\" otherwise say \"Others\"",
+              "required": true
+            },
+            {
+              "name": "Menu Name",
+              "description": "If the menu name if present then give the name, otherwise give \"No Name\"",
+              "required": true
+            },
+            {
+              "name": "Price",
+              "description": "If Image shows any price in it, give it. Otherwise say \"No Price given\"",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        1328,
+        -1840
+      ],
+      "id": "40b93e14-e532-438e-bded-f518fca6d2b6",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Message: \n{{ $json.output['Image Type'] }}\n{{ $json.output['Menu Name'] }}\n{{ $json.output.Price }}\nReply in a human, natural tone. Keep it short and helpful. Keep message simple. Be spesific. ",
+        "options": {
+          "systemMessage": "=You are a helpful assistant for Alit Watch Store, a daily watch retailer based in Dhaka City. Alit Watch Store delivers branded and stylish watches every day.\n\n📍 Delivery Areas: Mohammadpur, Lalmatia, Dhanmondi, Panthopath, Jigatola, Shyamoli, Adabor, Farmgate, Agargaon, Kolabagan.\n\n📦 Product Packages: Packages price are fixed. Do not change or modify the package price.\n– Regular Watches (৳1,350): Standard models with basic features.\n– Premium Watches (৳2,500): Sonali/Top brand watches with premium finish.\n– Corporate Watches (৳3,000): Luxury watches with leather straps and additional features.\n\n🕘 Order Timing:\n– Orders are accepted before 9:00 PM for same-day delivery. For instant orders, customers need to call or WhatsApp.\n\nIf someone wants to order, ask them to directly call or WhatsApp at +01882030873. Provide your full name, phone number, delivery address, and product quantity.\n\n– Approx Delivery time: Between 12:00 PM to 7:00 PM depending on area.\n\nPayment system:\n– Customer can pay via bank transfer, bKash, or cash on delivery.\n\n📞 To Order:\n– Minimum order: 1 watch. For bulk orders or special requests, call or WhatsApp directly.\n– Place order via WhatsApp at +8801757278206 or direct call.\n\n📦 Packaging:\n– Watches are delivered in original branded box with gift wrap if requested.\n\n🌐 Language Rule:\n– If the customer messages in Bengali, reply in Bengali.\n– If in English, reply in English.\n\n🤖 If you do not know the answer to a query, reply with:\n“Please call or WhatsApp us at +8801757278206 for more details.”\n\nIf customers say \"Ok\" or \"Thanks\", reply: \"Thanks for contacting Alit Watch Store.\"\n\nBe always polite, informative, and clear. Help users understand the watch models, delivery process, and how to place an order. Keep message simple and specific.\n\nCurrent time: {{ $now.format(\"YYYY-MM-DD HH:mm:ss\") }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1744,
+        -1824
+      ],
+      "id": "6782270f-f196-4b5a-9852-892468e4f832",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v23.0/{{ $('Webhook').item.json.body.entry[0].messaging[0].recipient.id }}/messages?access_token=EAALhwLraGcIBPYKfPjeaCE2jFnCWZBRGfD5eiGxcMXbDYFRL5DmiIfGtBkoXpFO84oMZClnITXwt9LecINyWXFlvLU5a3tq92FnTAyGSmrvkSRhNIoCtMJz0ZCEA6onbmF2DkYsBGcp6anfGEi51dqna3o4yiTBIO9hw6VzrCewWF9oUtMxCpWLsbZCEasWIvrKM5AHCwgZDZD",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"{{ $('Webhook').item.json.body.entry[0].messaging[0].sender.id }}\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": \"{{ $json.output }}\"\n  }\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2032,
+        -1840
+      ],
+      "id": "e084ba5f-b60c-4f62-932f-4e92b4601d06",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0].json;\n\nconst PAGE_ID = \"700293796500650\"; // replace with your page id\n\n// Stop if message is from your page (bot itself)\nif (item.sender && item.sender.id === PAGE_ID) {\n  return [];\n}\n\n// If message has image attachment → reply once\nif (item.message && item.message.attachments) {\n  const isImage = item.message.attachments.some(att => att.type === \"image\");\n  if (isImage) {\n    // Allow workflow to continue\n    return items;\n  } else {\n    // If attachment is not image, stop\n    return [];\n  }\n}\n\n// If it's a normal text message, let it continue as usual\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        -1840
+      ],
+      "id": "6437d63e-cb2e-4630-8890-e1551f025caa",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -1276
+      ],
+      "id": "a8b86af9-9f18-4df2-98f3-3d8871346bbb",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "xaf130QHT1XkI7vK",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1688,
+        -1616
+      ],
+      "id": "8eff15c3-e0bb-42a9-924f-ad50d34e53c2",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "xaf130QHT1XkI7vK",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        -1616
+      ],
+      "id": "20c8119e-e3d5-4046-82e1-aeffa728c36c",
+      "name": "Groq Chat Model4",
+      "credentials": {
+        "groqApi": {
+          "id": "xaf130QHT1XkI7vK",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgur.com/3/image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Client-ID 5d33fdfd6c52b61"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image",
+              "value": "={{ $json.imageUrl }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        -1840
+      ],
+      "id": "4dfdfca1-0556-4c6e-bbf9-6429b7721995",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.entry[0].messaging[0].sender.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        -592
+      ],
+      "id": "025e360c-b1fa-452a-a115-db065744f098",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v23.0/{{ $('Edit Fields').item.json.receiver_id }}/messages?access_token=EAALhwLraGcIBPYKfPjeaCE2jFnCWZBRGfD5eiGxcMXbDYFRL5DmiIfGtBkoXpFO84oMZClnITXwt9LecINyWXFlvLU5a3tq92FnTAyGSmrvkSRhNIoCtMJz0ZCEA6onbmF2DkYsBGcp6anfGEi51dqna3o4yiTBIO9hw6VzrCewWF9oUtMxCpWLsbZCEasWIvrKM5AHCwgZDZD",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"{{ $('Edit Fields').item.json.sender_id }}\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": \"{{ $json.output.text }}\"\n  },\n  \"reply_to\": {\n    \"mid\": \"{{ $('Edit Fields').item.json['M-ID'] }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1184,
+        -1680
+      ],
+      "id": "3ac9dfef-39be-4b88-aca0-aa0205169b0f",
+      "name": "REPLY"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rasin-ai.onrender.com/api/rasin/image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "What is happening in this image?"
+            },
+            {
+              "name": "url",
+              "value": "={{ $('HTTP Request1').item.json.imageUrl }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        -1840
+      ],
+      "id": "f9ff5b2a-6e2a-4b32-a710-c67f04ee96fd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "565d29f3-74fc-437d-95bf-76490d565dee",
+              "leftValue": "={{ $json.body.entry[0].messaging[0].message.attachments[0].type }}",
+              "rightValue": "audio",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        -2032
+      ],
+      "id": "619b8d36-49e5-4776-9741-42c170d19b68",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a3bf7418-53ba-4e95-86ec-20241bde2b76",
+              "name": "audio",
+              "value": "={{ $json.body.entry[0].messaging[0].message.attachments[0].payload.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        56,
+        -2032
+      ],
+      "id": "3e720065-993c-4b66-a3d8-e1f93a6d331e",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        472,
+        -1276
+      ],
+      "id": "3bce952b-d889-4750-8941-f829832953b7",
+      "name": "Groq Chat Model5",
+      "credentials": {
+        "groqApi": {
+          "id": "xaf130QHT1XkI7vK",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Message: {{ $json.message }}\nReply in a human, natural tone. Keep it short and helpful. Keep message simple. Be spesific. ",
+        "options": {
+          "systemMessage": "=AI Shopping Assistant Prompt (Full Version):\n\nআপনি AI Shopping Assistant Alit-Shop এর জন্য। আপনার কাছে দুটি Google Sheet আছে:\n\n1. Products Sheet: Product ID, Product Name, Category, Price (BDT), Offer Price, Stock Quantity, Color, Warranty, Specifications, Usage, Image Link, Description, Variants।\n\n2. Order Sheet: ID, Customer Name, Phone Number, Address, Police Station, Area, Ordered Product ID, Ordered Product Name, Color, Price, Delivery Charge, Total Bill, Notes, Order Date।\n\nResponse Rules:\n\nসব উত্তর Bangla, friendly, professional, single-line text, কোনো Emoji, newline বা special character নয়।\n\nResponse সবসময় হবে response:, product:, বা order details: ফরম্যাটে।\n\nCustomer যদি ছবি দেখতে চায়, তারা বলবে Image:true বা Image:false এবং response-এ text + Image:true/false থাকবে।\n\nCustomer যদি কোনো মডেল বা পণ্যের নাম বলে, Products Sheet থেকে সেই প্রোডাক্টের তথ্য বের করুন। Format: product: <Product Name>\n\nStock 0 হলে politeভাবে inform করুন। Multiple products match হলে Top 3 দেখান।\n\nTotal Bill always include Delivery Charge।\n\nOrder confirm হলে Admin Telegram-এ full order notification পাঠান।\n\nCustomer Query Handling:\n\nProducts Sheet চেক করে accurate Product Info দিন: Product ID, Product Name, Category, Price, Color, Stock Availability, short description, Specifications, Warranty, Usage, Variants।\n\nStock থাকলে জানাবেন, Stock না থাকলে politely inform করুন।\n\nCustomer Order Handling:\nPoliteভাবে সব details collect করুন:\n\nCustomer Name\n\nPhone Number\n\nAddress\n\nPolice Station\n\nArea\n\nOrdered Product ID\n\nOrdered Product Name\n\nColor\n\nPrice\n\nDelivery Charge\n\nTotal Bill\n\nNotes (if any)\n\nOrder Date (আজকের তারিখ)\n\nStock validate করুন।\n\nStock থাকলে Order Sheet-এ সংরক্ষণ করুন।\n\nStock না থাকলে politeভাবে inform করুন।\n\nOrder confirm হলে Admin Telegram-এ full order notification পাঠান।\n\nImage Handling:\n\nCustomer যদি ছবি দেখতে চায়, Image:true বা Image:false ব্যবহার করুন।\n\nResponse সবসময় text + Image:true/false ফরম্যাটে হবে।\n\nExample Responses:\nresponse: আমাদের কাছে বিভিন্ন ধরনের ঘড়ি আছে, কোন ধরনের ঘড়ির ছবি চান? Smart Watch, Analog Watch, নাকি অন্য কিছু? Image:true\nproduct: Poedagar 613 Luxury Wrist Watch For Men Image:true\norder details: Customer Name: Rahim, Phone Number: 017XXXXXXXX, Address: Dhanmondi, Police Station: Dhanmondi, Area: Block C, Ordered Product ID: P613, Ordered Product Name: Poedagar 613 Luxury Wrist Watch, Color: Black, Price: 2300 BDT, Delivery Charge: 150 BDT, Total Bill: 2450 BDT, Notes: Gift wrap, Order Date: 2025-09-14 Image:true\n\nCurrent Time: {{ $now.format(\"YYYY-MM-DD HH:mm:ss\") }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -8,
+        -1500
+      ],
+      "id": "e1dc6b63-50d9-4460-9250-d0c079068810",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "text",
+              "description": "see text response and separate it",
+              "required": true
+            },
+            {
+              "name": "Image",
+              "description": "If the image true  then give true, otherwise give \"false\"\"",
+              "required": true
+            },
+            {
+              "name": "product",
+              "description": "if you talk about any model then give this otherwise ",
+              "required": true
+            },
+            {
+              "name": "Product link",
+              "description": "if give product link then response",
+              "required": true
+            },
+            {
+              "name": "confirm",
+              "description": "if order conform then type true..if the order has already been placed then show false",
+              "required": true
+            },
+            {
+              "name": "order details",
+              "description": "show customer every details and order information on currect way if find",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        -1488
+      ],
+      "id": "e83117ee-da49-4e84-a90e-d5fb1a0bdec0",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1_3I8enQeDfHw5sJTuHFvDfuDW1SMlHOsqTqfCnRahpU",
+          "mode": "list",
+          "cachedResultName": "Product",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_3I8enQeDfHw5sJTuHFvDfuDW1SMlHOsqTqfCnRahpU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_3I8enQeDfHw5sJTuHFvDfuDW1SMlHOsqTqfCnRahpU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        -1276
+      ],
+      "id": "aabb7117-e007-4139-9098-05e09a654787",
+      "name": "product",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "jFLz9cE5kC8l3DQZ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1wPrgaG0YCwSFqByr8WtyKcI1NlXdZAdiG4LGe8pHtkg",
+          "mode": "list",
+          "cachedResultName": "order",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wPrgaG0YCwSFqByr8WtyKcI1NlXdZAdiG4LGe8pHtkg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wPrgaG0YCwSFqByr8WtyKcI1NlXdZAdiG4LGe8pHtkg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "product id ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('product_id_', ``, 'string') }}",
+            "color": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('color', ``, 'string') }}",
+            "price": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('price', ``, 'string') }}",
+            "delivary charge": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('delivary_charge', ``, 'string') }}",
+            "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', ``, 'string') }}",
+            "number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('number', ``, 'string') }}",
+            "Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address', ``, 'string') }}",
+            "police station ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('police_station_', ``, 'string') }}",
+            "area": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('area', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "product id ",
+              "displayName": "product id ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "color",
+              "displayName": "color",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivary charge",
+              "displayName": "delivary charge",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "number",
+              "displayName": "number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "police station ",
+              "displayName": "police station ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "area",
+              "displayName": "area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        -1276
+      ],
+      "id": "7adfade4-c3fc-4d52-a859-8fa14251dd83",
+      "name": "order",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "jFLz9cE5kC8l3DQZ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f76998b6-baec-45c3-be33-6a1bf93fcbd8",
+              "leftValue": "={{ $json.output.confirm }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        -1296
+      ],
+      "id": "c02023fa-1915-4807-ab78-3817c2b23f61",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "chatId": "5900834915",
+        "text": "={{ $json.cleanedText }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1744,
+        -1404
+      ],
+      "id": "c116a660-ac9b-4656-b61e-9b9144f2e734",
+      "name": "Send a text message",
+      "webhookId": "933de39d-b155-410c-b3a6-84ee990774d1",
+      "credentials": {
+        "telegramApi": {
+          "id": "8XHuv6jE8jdjkXUS",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1048,
+        -1180
+      ],
+      "id": "b35eea91-e0f5-4a05-99ee-33f9d463a151",
+      "name": "Groq Chat Model6",
+      "credentials": {
+        "groqApi": {
+          "id": "xaf130QHT1XkI7vK",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI থেকে আসা raw text\nconst text = $input.first().json.output\n\n// \\n কে বাস্তব line break এ পরিবর্তন\nlet cleanedText = text.replace(/\\\\n/g, \"\\n\");\n\n// MarkdownV2 special characters escape\ncleanedText = cleanedText.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1');\n\nreturn [\n  {\n    json: {\n      cleanedText\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        -1404
+      ],
+      "id": "314b9ed3-c6cc-47b9-b2c2-6349f3ed38e5",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.entry[0].messaging[0].sender.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        -1072
+      ],
+      "id": "4e5d04fc-9e56-48ec-97b3-fa7eddadac4d",
+      "name": "Simple Memory1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "REPLY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "product": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "order": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "timeSavedPerExecution": 11,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "errorWorkflow": "66iVjPjZXrhNNFiL"
+  },
+  "versionId": "c5225cec-9e2a-4916-9ce5-dae97d34a2fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1fe929e76f7a6391514effef33cf5974120be2fb1f77f683248369b4d1035e87"
+  },
+  "id": "66iVjPjZXrhNNFiL",
+  "tags": []
+}
