@@ -6,6 +6,7 @@
     "start": "npx n8n"
   },
   "dependencies": {
-    "n8n": "^2.250.0"
-  }
+  "n8n": "latest"
+}
+
 }
